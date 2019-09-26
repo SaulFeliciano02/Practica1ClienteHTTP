@@ -1,10 +1,12 @@
+import org.jsoup.Connection;
+import java.io.IOException;
 import org.jsoup.Jsoup;
+import java.text.Normalizer;
+import java.util.Scanner;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import java.io.IOException;
-import java.util.Scanner;
+import org.jsoup.nodes.FormElement;
 
 public class Main {
 
@@ -14,6 +16,11 @@ public class Main {
         Scanner scan = new Scanner(System.in);
         String url = scan.next();
         Document d = Jsoup.connect(url).get();
+        String res = Jsoup.connect(url).execute().body();
+
+        //Apartado uno
+        int cantidadLineas = res.split("\n").length;
+        System.out.println("Número de líneas: " + cantidadLineas);
 
        //Apartado dos (Parrafos)
         int pValue = 0;
@@ -61,5 +68,24 @@ public class Main {
             System.out.println("Input " + inputValue + " tipo: " + tipo);
         }
 
+        //Apartado seis Petición
+        int formV = 0;
+        for (Element form: d.getElementsByTag("form").forms()) {
+            Elements postform = d.select("form[method=post]");
+
+            for (Element ep : postform) {
+                try {
+                    System.out.println("Form: " + formV + " encontrado:");
+                    String AbURL = ep.absUrl("action");
+                    Document doc = Jsoup.connect(AbURL).data("asignatura", "practica1").header("matricula", "20161534").post();
+                    System.out.println(doc.body().toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            formV++;
+
+            System.out.println("----------------------------------------------------------------------------------------------------");
+        }
     }
 }
